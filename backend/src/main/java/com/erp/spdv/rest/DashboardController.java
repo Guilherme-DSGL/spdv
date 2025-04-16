@@ -1,11 +1,6 @@
 package com.erp.spdv.rest;
 
 import java.time.LocalDate;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,19 +16,19 @@ public class DashboardController {
 	private final SaleRepository saleRepository;
 	private final ClientRepository clientRepository;
 	private final ProductRepository productRepository;
-	
-	@Autowired
-	public DashboardController(SaleRepository repository, ClientRepository clientRepository, ProductRepository productRepository) {
+
+	public DashboardController(SaleRepository repository, ClientRepository clientRepository,
+			ProductRepository productRepository) {
 		this.saleRepository = repository;
 		this.clientRepository = clientRepository;
 		this.productRepository = productRepository;
 	}
-	
+
 	@GetMapping()
 	public DashboardDTO getDashboard() {
 		DashboardDTO dashboardDTO = new DashboardDTO();
 		var currentMonth = LocalDate.now().getMonthValue();
-		var lastMonth = currentMonth -1 ;
+		var lastMonth = currentMonth - 1;
 		dashboardDTO.setAmountAllSales(saleRepository.count());
 		dashboardDTO.setAmountAllProducts(productRepository.count());
 		dashboardDTO.setAmountAllClients(clientRepository.count());

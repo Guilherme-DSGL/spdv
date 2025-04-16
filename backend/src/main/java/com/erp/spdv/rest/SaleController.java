@@ -2,7 +2,6 @@ package com.erp.spdv.rest;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,66 +28,66 @@ public class SaleController {
 	private final SaleRepository repository;
 	private final ClientRepository clientRepository;
 	private final ProductRepository productRepository;
-	
-	@Autowired
-	public SaleController(SaleRepository repository, ClientRepository clientRepository, ProductRepository productRepository) {
+
+	public SaleController(SaleRepository repository, ClientRepository clientRepository,
+			ProductRepository productRepository) {
 		this.repository = repository;
 		this.clientRepository = clientRepository;
 		this.productRepository = productRepository;
 	}
-	
+
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Sale save( @RequestBody @Valid SaleDTO saleDTO) {		
+	public Sale save(@RequestBody @Valid SaleDTO saleDTO) {
 		Sale sale = saleDTO.saleFromDTO(saleDTO, clientRepository, productRepository);
 		sale = this.repository.save(sale);
 		this.productRepository.substractStock(sale.getProduct().getId());
 		sale.substractStock();
 		return sale;
 	}
+
 	@GetMapping()
 	public List<Sale> getAllSales() {
 		return this.repository
 				.findAll();
 	}
-	
+
 	@GetMapping("{id}")
 	public Sale getSaleById(@PathVariable Integer id) {
 		return this.repository
 				.findById(id)
-				.orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto nao encontrado"));
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto nao encontrado"));
 	}
-	
-	
+
 	@DeleteMapping("{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void deleteSaleById(@PathVariable Integer id) {
 		this.repository
-			.findById(id)
-			.map(sale -> {
+				.findById(id)
+				.map(sale -> {
 					repository.deleteById(id);
 					return Void.TYPE;
 				})
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 	}
-	
+
 	@PutMapping("{id}")
-	@ResponseStatus(HttpStatus.NO_CONTENT)                          
+	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void update(@PathVariable Integer id, @RequestBody SaleDTO saleDTO) {
 		this.repository
-		.findById(id)
-		.map( sale -> {
-				Sale saleUpdated = saleDTO.saleFromDTO(saleDTO, clientRepository, productRepository);
-				Integer saleUpdatedProductId = saleUpdated.getProduct().getId();
-				Integer saleProductId = sale.getProduct().getId();
-				saleUpdated.setId(sale.getId());
-				saleUpdated = repository.save(saleUpdated);
-				if(saleUpdatedProductId != saleProductId) {
-				productRepository.addStock(saleProductId);
-				productRepository.substractStock(saleUpdatedProductId);
-				}
-				return saleUpdated;
-			}) 
-		.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+				.findById(id)
+				.map(sale -> {
+					Sale saleUpdated = saleDTO.saleFromDTO(saleDTO, clientRepository, productRepository);
+					Integer saleUpdatedProductId = saleUpdated.getProduct().getId();
+					Integer saleProductId = sale.getProduct().getId();
+					saleUpdated.setId(sale.getId());
+					saleUpdated = repository.save(saleUpdated);
+					if (saleUpdatedProductId != saleProductId) {
+						productRepository.addStock(saleProductId);
+						productRepository.substractStock(saleUpdatedProductId);
+					}
+					return saleUpdated;
+				})
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 	}
 }

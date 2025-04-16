@@ -1,10 +1,6 @@
 package com.erp.spdv.model.entity;
 
-import java.math.BigInteger;
 import java.util.Collection;
-import java.util.Collections;
-
-
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -31,20 +27,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User implements UserDetails{
-	
+public class User implements UserDetails {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	
-	@Column( nullable = false)
+
+	@Column(nullable = false)
 	private String name;
-	
+
 	@Column(nullable = false)
 	private String password;
-	
-	
-	@Column(nullable =false)
+
+	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private Role role;
 
@@ -82,6 +77,5 @@ public class User implements UserDetails{
 	public String getPassword() {
 		return this.password;
 	}
-	
-	
+
 }
